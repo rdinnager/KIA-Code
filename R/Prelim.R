@@ -15,10 +15,11 @@ hist(res$Length,breaks=50)
 library(ggplot2)
 
 ggplot( tax, aes( y=rescounts, x=count ) ) + 
-  stat_smooth( method="lm", mapping=aes(linetype=difficulty,colour=difficulty),size=1.2,fullrange=F) +
+  stat_smooth( method="lm", mapping=aes(colour=difficulty),size=1.2,fullrange=F) +
   geom_point( aes(fill=difficulty),shape=21,size=5 ) + 
   ylab("Microscope Count") + xlab("Image Count") +
-  geom_segment(x=0,y=0,xend=4000,yend=4000) +
+  geom_segment(x=0,y=0,xend=4000,yend=4000) + scale_colour_discrete(breaks=c("High","Med","Low")) +
+  scale_fill_discrete(breaks=c("High","Med","Low")) +
   #scale_fill_manual(name="Difficulty (Amount of scales, Collembola, and Mites)",values=c("white","grey","black")) + 
   #scale_linetype_manual(name="Difficulty (Amount of scales, Collembola, and Mites)",values=c("dashed", "solid"))+theme_bw()+
   theme(axis.title.x = element_text(  size=20),
@@ -64,7 +65,7 @@ ggplot( na.omit(taxhigh), aes( y=rescounts, x=count ) ) +
 
 
 ggplot( tax, aes( y=props, x=count ) ) + 
-  stat_smooth( method="lm", mapping=aes(linetype=difficulty,colour=difficulty),size=1.2,fullrange=F) +
+  stat_smooth( method="lm", mapping=aes(colour=difficulty),size=1.2,fullrange=F) +
   geom_point( aes(fill=difficulty),shape=21,size=5 ) + 
   ylab("Proportional Undercount") + xlab("Insects in Sample") +
   geom_segment(x=0,y=0,xend=4000,yend=0) +
