@@ -89,3 +89,23 @@ p + geom_violin(aes(fill = factor(Difficulty)),scale="count") + coord_flip() + t
  theme(axis.title.x = element_text(  size=50),
             axis.text.x  = element_text(vjust=0.5, size=30),axis.title.y = element_text( size=50),
             axis.text.y  = element_text(vjust=0.5, size=30),legend.text = element_text( size = 30))
+
+
+## count orders in image samples
+library(dplyr)
+library(magrittr)
+library(tidyr)
+order_dat <- res %>% mutate(sample = strsplit(Image, ".", fixed = TRUE) %>% sapply(function(x) x[1])) %>% filter(Taxon != "") %>%
+  mutate(sample = sub("-tray1|-tray2", "", sample))
+order_count <- order_dat %>% group_by(sample, Taxon) %>% summarise(Count = n()) %>% ungroup %>% 
+  mutate(sample = sub("-", "/", sample, fixed = TRUE))
+order_count_long <- order_count %>% group_by(sample, Taxon, Count) %>% do(letts = strsplit(.$sample, "")[[1]]) %>%
+  mutate(site = paste(letts[2:5], collapse = ""), habitat.type = letts[6], location = letts[7], 
+         collection.jar = paste(letts[8:9], collapse = "")) %>% select(-letts)
+#order_count_short <- order_count_long %>% group_by(sample, ) %>% mutate(Taxon = as.factor(Taxon)) %>% spread(Taxon, Count)
+order_count_short <- order_count_long %>% spread(Taxon, Count)
+order_count_short[is.na(order_count_short)] <- 0
+
+write.csv(order_count_long, file = "data/Kimberley_image_counts_Order_long_June24_2014.csv", row.names = FALSE)
+write.csv(order_count_short, file = "data/Kimberley_image_counts_Order_short_June24_2014.csv", row.names = FALSE)
+
