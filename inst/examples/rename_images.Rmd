@@ -1,0 +1,51 @@
+---
+title: "Image Renaming"
+author: "Russell Dinnage"
+date: "28/07/2014"
+output: 
+  html_document:
+    highlight: pygments
+---
+
+```{r knitr_init, echo=FALSE, results="asis", cache=FALSE}
+library(knitr)
+
+## Global options
+options(max.print="75")
+opts_chunk$set(fig.path="out/",
+               echo=TRUE,
+         cache=TRUE,
+               cache.path="cache/",
+               prompt=FALSE,
+               tidy=TRUE,
+               comment=NA,
+               message=FALSE,
+               warning=FALSE)
+opts_knit$set(width=75)
+```
+
+Here we will be trying to rename some image files, based on a nested directory structure that they are in. then we can get rid of the directory structure, which at the moment is the only thing identifying what sample the image copmes from (except for a label in the first image in the directory). First we can grab all of the image files names.
+
+```{r list_files}
+dir_name <- "/media/Kimberley-DataPhotos/5)\ Patch\ Sorted\ MP\ Photos-Checked"
+img_files <- list.files(dir_name, recursive = TRUE, full.names = TRUE)
+img_files[5000:5025]
+```
+
+There are two directories we don't need: `00_ColourCharts` and `00_Junk`. Let's remove those from the list.
+
+```{r rm_junk}
+img_files <- img_files[-grep("00_", img_files, fixed = TRUE)]
+img_files[1:50]
+```
+
+We can remove the redundant base directory from each of these.
+
+```{r rm_names}
+img_files <- gsub("/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/", "", img_files)
+img_files[1:50]
+length(img_files)
+```
+
+There are `r length(img_files)` images to be processed.
+

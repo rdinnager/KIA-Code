@@ -109,3 +109,4 @@ order_count_short[is.na(order_count_short)] <- 0
 write.csv(order_count_long, file = "data/Kimberley_image_counts_Order_long_June24_2014.csv", row.names = FALSE)
 write.csv(order_count_short, file = "data/Kimberley_image_counts_Order_short_June24_2014.csv", row.names = FALSE)
 
+
