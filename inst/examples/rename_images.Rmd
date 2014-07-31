@@ -36,16 +36,63 @@ There are two directories we don't need: `00_ColourCharts` and `00_Junk`. Let's 
 
 ```{r rm_junk}
 img_files <- img_files[-grep("00_", img_files, fixed = TRUE)]
+img_files <- img_files[-grep(".xmp", img_files, fixed = TRUE)] ## remove .xmp files
+img_files <- img_files[-grep("Renamed", img_files, fixed = TRUE)] ## already renamed files
 img_files[1:50]
+```
+
+We need to collect the date information from the files, because later we need to sort the files by date within each sample label.
+
+```{r collect_dates}
+file_dat <- file.info(img_files)$mtime
+file_dat[1:50]
 ```
 
 We can remove the redundant base directory from each of these.
 
 ```{r rm_names}
-img_files <- gsub("/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/", "", img_files)
-img_files[1:50]
-length(img_files)
+img_names <- gsub("/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/", "", img_files)
+img_names[1:50]
+length(img_names)
 ```
 
-There are `r length(img_files)` images to be processed.
+There are `r length(img_names)` images to be processed. We can create the properly formatted filenames using the packages `tidyr` and `dplyr`, and some string manipulation.
 
+```{r tidy_names}
+library(tidyr)
+library(dplyr)
+img_data <- data.frame(file_name = img_names) %>% separate(file_name, c("Patch", "Location", "Direction", "Filename"), "/", remove = FALSE) %>% separate(Filename, c("Filename","Extension"), "\\.") %>% mutate(Date = file_dat) %>% tbl_df
+img_data
+```
+
+The format of the filenames goes like this M\<patch\>\<location\>\<direction\>-\<col\>\<row\>-\<filetype\>.\<ext\>, where \<patch\> looks like 5-1, instead of 05_1. \<col\> and \<row\> are the column and row of the image on the tray. These should go in order starting with column A, and going through rows 1 - 4. We'll start by stripping leading zeroes and then reordering the images by date and time within each patch, location, direction combination.
+
+```{r rorder}
+img_data$Patch <- gsub("^0", "", img_data$Patch)
+img_data$Patch <- gsub("_", "-", img_data$Patch, fixed = TRUE)
+img_data
+img_data <- img_data %>% arrange(Patch, Location, Direction, Extension, Date)
+img_data %>% select(-file_name)
+```
+
+We will set up a vector with the right -\<col\>\<row\>-\<filetype\>.\<ext\> values in order. Then we can just concatenate everything together.
+
+```{r concat}
+file_ends <- list()
+file_ends[["JPG"]] <- c("-A1-J.jpg", "-A2-J.jpg", "-A3-J.jpg", "-A4-J.jpg", "-B1-J.jpg", "-B2-J.jpg", "-B3-J.jpg", "-B4-J.jpg", "-C1-J.jpg", "-C2-J.jpg", "-C3-J.jpg", "-C4-J.jpg", "-D1-J.jpg", "-D2-J.jpg", "-D3-J.jpg", "-D4-J.jpg", "-A1-J2.jpg", "-A2-J2.jpg", "-A3-J2.jpg", "-A4-J2.jpg", "-B1-J2.jpg", "-B2-J2.jpg", "-B3-J2.jpg", "-B4-J2.jpg", "-C1-J2.jpg", "-C2-J2.jpg", "-C3-J2.jpg", "-C4-J2.jpg", "-D1-J2.jpg", "-D2-J2.jpg", "-D3-J2.jpg", "-D4-J2.jpg")
+file_ends[["CR2"]] <- c("-A1-R.cr2", "-A2-R.cr2", "-A3-R.cr2", "-A4-R.cr2", "-B1-R.cr2", "-B2-R.cr2", "-B3-R.cr2", "-B4-R.cr2", "-C1-R.cr2", "-C2-R.cr2", "-C3-R.cr2", "-C4-R.cr2", "-D1-R.cr2", "-D2-R.cr2", "-D3-R.cr2", "-D4-R.cr2", "-A1-R2.cr2", "-A2-R2.cr2", "-A3-R2.cr2", "-A4-R2.cr2", "-B1-R2.cr2", "-B2-R2.cr2", "-B3-R2.cr2", "-B4-R2.cr2", "-C1-R2.cr2", "-C2-R2.cr2", "-C3-R2.cr2", "-C4-R2.cr2", "-D1-R2.cr2", "-D2-R2.cr2", "-D3-R2.cr2", "-D4-R2.cr2")
+img_data_new <- img_data %>% group_by(Patch, Location, Direction, Extension) %>% mutate(N = row_number()) %>%
+  rowwise %>% mutate(Ends = file_ends[[Extension]][N]) %>%
+  mutate(FullName = sprintf("M%s%s%s%s", Patch, Location, Direction, Ends))
+img_data_new$FullName
+```
+
+Now at last we can copt and rename the files.
+
+```{r copy_rename, eval=FALSE}
+old_files <- paste0("/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/",
+                    img_data_new$file_name)
+new_files <- paste0("/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/Renamed/",
+                    img_data_new$FullName)
+file.copy(old_files, new_files, copy.date = TRUE)
+```

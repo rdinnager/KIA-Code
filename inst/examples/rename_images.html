@@ -103,6 +103,8 @@ img_files[<span class="dv">5000</span>:<span class="dv">5025</span>]</code></pre
 [26] &quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/19_3/S1/nw/IMG_0032.JPG&quot;</code></pre>
 <p>There are two directories we don’t need: <code>00_ColourCharts</code> and <code>00_Junk</code>. Let’s remove those from the list.</p>
 <pre class="sourceCode r"><code class="sourceCode r">img_files &lt;-<span class="st"> </span>img_files[-<span class="kw">grep</span>(<span class="st">&quot;00_&quot;</span>, img_files, <span class="dt">fixed =</span> <span class="ot">TRUE</span>)]
+img_files &lt;-<span class="st"> </span>img_files[-<span class="kw">grep</span>(<span class="st">&quot;.xmp&quot;</span>, img_files, <span class="dt">fixed =</span> <span class="ot">TRUE</span>)]  ## remove .xmp files
+img_files &lt;-<span class="st"> </span>img_files[-<span class="kw">grep</span>(<span class="st">&quot;Renamed&quot;</span>, img_files, <span class="dt">fixed =</span> <span class="ot">TRUE</span>)]  ## already renamed files
 img_files[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre>
 <pre><code> [1] &quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/05_1/E2/ra/IMG_7134.CR2&quot;
  [2] &quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/05_1/E2/ra/IMG_7134.JPG&quot;
@@ -154,10 +156,38 @@ img_files[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre>
 [48] &quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/05_1/R3/nw/IMG_7165.JPG&quot;
 [49] &quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/05_1/R3/se/IMG_7095.CR2&quot;
 [50] &quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/05_1/R3/se/IMG_7095.JPG&quot;</code></pre>
+<p>We need to collect the date information from the files, because later we need to sort the files by date within each sample label.</p>
+<pre class="sourceCode r"><code class="sourceCode r">file_dat &lt;-<span class="st"> </span><span class="kw">file.info</span>(img_files)$mtime
+file_dat[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre>
+<pre><code> [1] &quot;2013-01-16 13:04:02 WST&quot; &quot;2013-01-16 13:04:02 WST&quot;
+ [3] &quot;2013-01-16 13:04:44 WST&quot; &quot;2013-01-16 13:04:44 WST&quot;
+ [5] &quot;2013-01-16 13:05:12 WST&quot; &quot;2013-01-16 13:05:12 WST&quot;
+ [7] &quot;2013-01-16 13:05:48 WST&quot; &quot;2013-01-16 13:05:48 WST&quot;
+ [9] &quot;2013-01-16 13:06:14 WST&quot; &quot;2013-01-16 13:06:12 WST&quot;
+[11] &quot;2013-01-16 13:07:00 WST&quot; &quot;2013-01-16 13:07:00 WST&quot;
+[13] &quot;2013-01-16 13:07:32 WST&quot; &quot;2013-01-16 13:07:32 WST&quot;
+[15] &quot;2013-01-16 13:07:56 WST&quot; &quot;2013-01-16 13:07:56 WST&quot;
+[17] &quot;2013-01-16 16:20:14 WST&quot; &quot;2013-01-16 16:20:14 WST&quot;
+[19] &quot;2013-01-16 16:20:38 WST&quot; &quot;2013-01-16 16:20:38 WST&quot;
+[21] &quot;2013-01-16 16:20:56 WST&quot; &quot;2013-01-16 16:20:56 WST&quot;
+[23] &quot;2013-01-16 16:21:16 WST&quot; &quot;2013-01-16 16:21:14 WST&quot;
+[25] &quot;2013-01-16 16:21:42 WST&quot; &quot;2013-01-16 16:21:42 WST&quot;
+[27] &quot;2013-01-16 16:22:06 WST&quot; &quot;2013-01-16 16:22:06 WST&quot;
+[29] &quot;2013-01-16 16:22:34 WST&quot; &quot;2013-01-16 16:22:34 WST&quot;
+[31] &quot;2013-01-16 16:22:58 WST&quot; &quot;2013-01-16 16:22:56 WST&quot;
+[33] &quot;2013-01-16 13:35:40 WST&quot; &quot;2013-01-16 13:35:38 WST&quot;
+[35] &quot;2013-01-16 13:36:12 WST&quot; &quot;2013-01-16 13:36:12 WST&quot;
+[37] &quot;2013-01-16 13:36:34 WST&quot; &quot;2013-01-16 13:36:34 WST&quot;
+[39] &quot;2013-01-16 13:37:22 WST&quot; &quot;2013-01-16 13:37:22 WST&quot;
+[41] &quot;2013-01-16 13:37:50 WST&quot; &quot;2013-01-16 13:37:50 WST&quot;
+[43] &quot;2013-01-16 13:38:16 WST&quot; &quot;2013-01-16 13:38:16 WST&quot;
+[45] &quot;2013-01-16 13:38:42 WST&quot; &quot;2013-01-16 13:38:42 WST&quot;
+[47] &quot;2013-01-16 13:41:30 WST&quot; &quot;2013-01-16 13:41:28 WST&quot;
+[49] &quot;2013-01-16 10:55:12 WST&quot; &quot;2013-01-16 10:55:12 WST&quot;</code></pre>
 <p>We can remove the redundant base directory from each of these.</p>
-<pre class="sourceCode r"><code class="sourceCode r">img_files &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/&quot;</span>, 
+<pre class="sourceCode r"><code class="sourceCode r">img_names &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/&quot;</span>, 
     <span class="st">&quot;&quot;</span>, img_files)
-img_files[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre>
+img_names[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre>
 <pre><code> [1] &quot;05_1/E2/ra/IMG_7134.CR2&quot; &quot;05_1/E2/ra/IMG_7134.JPG&quot;
  [3] &quot;05_1/E2/ra/IMG_7135.CR2&quot; &quot;05_1/E2/ra/IMG_7135.JPG&quot;
  [5] &quot;05_1/E2/ra/IMG_7136.CR2&quot; &quot;05_1/E2/ra/IMG_7136.JPG&quot;
@@ -183,9 +213,116 @@ img_files[<span class="dv">1</span>:<span class="dv">50</span>]</code></pre>
 [45] &quot;05_1/R3/nw/IMG_7164.CR2&quot; &quot;05_1/R3/nw/IMG_7164.JPG&quot;
 [47] &quot;05_1/R3/nw/IMG_7165.CR2&quot; &quot;05_1/R3/nw/IMG_7165.JPG&quot;
 [49] &quot;05_1/R3/se/IMG_7095.CR2&quot; &quot;05_1/R3/se/IMG_7095.JPG&quot;</code></pre>
-<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(img_files)</code></pre>
-<pre><code>[1] 3585</code></pre>
-<p>There are 3585 images to be processed.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">length</span>(img_names)</code></pre>
+<pre><code>[1] 3584</code></pre>
+<p>There are 3584 images to be processed. We can create the properly formatted filenames using the packages <code>tidyr</code> and <code>dplyr</code>, and some string manipulation.</p>
+<pre class="sourceCode r"><code class="sourceCode r"><span class="kw">library</span>(tidyr)
+<span class="kw">library</span>(dplyr)
+img_data &lt;-<span class="st"> </span><span class="kw">data.frame</span>(<span class="dt">file_name =</span> img_names) %&gt;%<span class="st"> </span><span class="kw">separate</span>(file_name, <span class="kw">c</span>(<span class="st">&quot;Patch&quot;</span>, 
+    <span class="st">&quot;Location&quot;</span>, <span class="st">&quot;Direction&quot;</span>, <span class="st">&quot;Filename&quot;</span>), <span class="st">&quot;/&quot;</span>, <span class="dt">remove =</span> <span class="ot">FALSE</span>) %&gt;%<span class="st"> </span><span class="kw">separate</span>(Filename, 
+    <span class="kw">c</span>(<span class="st">&quot;Filename&quot;</span>, <span class="st">&quot;Extension&quot;</span>), <span class="st">&quot;</span><span class="ch">\\</span><span class="st">.&quot;</span>) %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Date =</span> file_dat) %&gt;%<span class="st"> </span>tbl_df
+img_data</code></pre>
+<pre><code>Source: local data frame [3,584 x 7]
+
+                 file_name Patch Location Direction Filename Extension
+1  05_1/E2/ra/IMG_7134.CR2  05_1       E2        ra IMG_7134       CR2
+2  05_1/E2/ra/IMG_7134.JPG  05_1       E2        ra IMG_7134       JPG
+3  05_1/E2/ra/IMG_7135.CR2  05_1       E2        ra IMG_7135       CR2
+4  05_1/E2/ra/IMG_7135.JPG  05_1       E2        ra IMG_7135       JPG
+5  05_1/E2/ra/IMG_7136.CR2  05_1       E2        ra IMG_7136       CR2
+6  05_1/E2/ra/IMG_7136.JPG  05_1       E2        ra IMG_7136       JPG
+7  05_1/E2/ra/IMG_7137.CR2  05_1       E2        ra IMG_7137       CR2
+8  05_1/E2/ra/IMG_7137.JPG  05_1       E2        ra IMG_7137       JPG
+9  05_1/E2/ra/IMG_7138.CR2  05_1       E2        ra IMG_7138       CR2
+10 05_1/E2/ra/IMG_7138.JPG  05_1       E2        ra IMG_7138       JPG
+..                     ...   ...      ...       ...      ...       ...
+Variables not shown: Date (time)</code></pre>
+<p>The format of the filenames goes like this M&lt;patch&gt;&lt;location&gt;&lt;direction&gt;-&lt;col&gt;&lt;row&gt;-&lt;filetype&gt;.&lt;ext&gt;, where &lt;patch&gt; looks like 5-1, instead of 05_1. &lt;col&gt; and &lt;row&gt; are the column and row of the image on the tray. These should go in order starting with column A, and going through rows 1 - 4. We’ll start by stripping leading zeroes and then reordering the images by date and time within each patch, location, direction combination.</p>
+<pre class="sourceCode r"><code class="sourceCode r">img_data$Patch &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;^0&quot;</span>, <span class="st">&quot;&quot;</span>, img_data$Patch)
+img_data$Patch &lt;-<span class="st"> </span><span class="kw">gsub</span>(<span class="st">&quot;_&quot;</span>, <span class="st">&quot;-&quot;</span>, img_data$Patch, <span class="dt">fixed =</span> <span class="ot">TRUE</span>)
+img_data</code></pre>
+<pre><code>Source: local data frame [3,584 x 7]
+
+                 file_name Patch Location Direction Filename Extension
+1  05_1/E2/ra/IMG_7134.CR2   5-1       E2        ra IMG_7134       CR2
+2  05_1/E2/ra/IMG_7134.JPG   5-1       E2        ra IMG_7134       JPG
+3  05_1/E2/ra/IMG_7135.CR2   5-1       E2        ra IMG_7135       CR2
+4  05_1/E2/ra/IMG_7135.JPG   5-1       E2        ra IMG_7135       JPG
+5  05_1/E2/ra/IMG_7136.CR2   5-1       E2        ra IMG_7136       CR2
+6  05_1/E2/ra/IMG_7136.JPG   5-1       E2        ra IMG_7136       JPG
+7  05_1/E2/ra/IMG_7137.CR2   5-1       E2        ra IMG_7137       CR2
+8  05_1/E2/ra/IMG_7137.JPG   5-1       E2        ra IMG_7137       JPG
+9  05_1/E2/ra/IMG_7138.CR2   5-1       E2        ra IMG_7138       CR2
+10 05_1/E2/ra/IMG_7138.JPG   5-1       E2        ra IMG_7138       JPG
+..                     ...   ...      ...       ...      ...       ...
+Variables not shown: Date (time)</code></pre>
+<pre class="sourceCode r"><code class="sourceCode r">img_data &lt;-<span class="st"> </span>img_data %&gt;%<span class="st"> </span><span class="kw">arrange</span>(Patch, Location, Direction, Extension, Date)
+img_data %&gt;%<span class="st"> </span><span class="kw">select</span>(-file_name)</code></pre>
+<pre><code>Source: local data frame [3,584 x 6]
+
+   Patch Location Direction                      Filename Extension
+1   11-2       E2        sb Photography (Bruce Day 1) 193       CR2
+2   11-2       E2        sb Photography (Bruce Day 1) 194       CR2
+3   11-2       E2        sb Photography (Bruce Day 1) 195       CR2
+4   11-2       E2        sb Photography (Bruce Day 1) 196       CR2
+5   11-2       E2        sb Photography (Bruce Day 1) 200       CR2
+6   11-2       E2        sb Photography (Bruce Day 1) 201       CR2
+7   11-2       E2        sb Photography (Bruce Day 1) 203       CR2
+8   11-2       E2        sb Photography (Bruce Day 1) 205       CR2
+9   11-2       E2        sb Photography (Bruce Day 1) 193       JPG
+10  11-2       E2        sb Photography (Bruce Day 1) 194       JPG
+..   ...      ...       ...                           ...       ...
+Variables not shown: Date (time)</code></pre>
+<p>We will set up a vector with the right -&lt;col&gt;&lt;row&gt;-&lt;filetype&gt;.&lt;ext&gt; values in order. Then we can just concatenate everything together.</p>
+<pre class="sourceCode r"><code class="sourceCode r">file_ends &lt;-<span class="st"> </span><span class="kw">list</span>()
+file_ends[[<span class="st">&quot;JPG&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;-A1-J.jpg&quot;</span>, <span class="st">&quot;-A2-J.jpg&quot;</span>, <span class="st">&quot;-A3-J.jpg&quot;</span>, <span class="st">&quot;-A4-J.jpg&quot;</span>, 
+    <span class="st">&quot;-B1-J.jpg&quot;</span>, <span class="st">&quot;-B2-J.jpg&quot;</span>, <span class="st">&quot;-B3-J.jpg&quot;</span>, <span class="st">&quot;-B4-J.jpg&quot;</span>, <span class="st">&quot;-C1-J.jpg&quot;</span>, <span class="st">&quot;-C2-J.jpg&quot;</span>, 
+    <span class="st">&quot;-C3-J.jpg&quot;</span>, <span class="st">&quot;-C4-J.jpg&quot;</span>, <span class="st">&quot;-D1-J.jpg&quot;</span>, <span class="st">&quot;-D2-J.jpg&quot;</span>, <span class="st">&quot;-D3-J.jpg&quot;</span>, <span class="st">&quot;-D4-J.jpg&quot;</span>, 
+    <span class="st">&quot;-A1-J2.jpg&quot;</span>, <span class="st">&quot;-A2-J2.jpg&quot;</span>, <span class="st">&quot;-A3-J2.jpg&quot;</span>, <span class="st">&quot;-A4-J2.jpg&quot;</span>, <span class="st">&quot;-B1-J2.jpg&quot;</span>, <span class="st">&quot;-B2-J2.jpg&quot;</span>, 
+    <span class="st">&quot;-B3-J2.jpg&quot;</span>, <span class="st">&quot;-B4-J2.jpg&quot;</span>, <span class="st">&quot;-C1-J2.jpg&quot;</span>, <span class="st">&quot;-C2-J2.jpg&quot;</span>, <span class="st">&quot;-C3-J2.jpg&quot;</span>, <span class="st">&quot;-C4-J2.jpg&quot;</span>, 
+    <span class="st">&quot;-D1-J2.jpg&quot;</span>, <span class="st">&quot;-D2-J2.jpg&quot;</span>, <span class="st">&quot;-D3-J2.jpg&quot;</span>, <span class="st">&quot;-D4-J2.jpg&quot;</span>)
+file_ends[[<span class="st">&quot;CR2&quot;</span>]] &lt;-<span class="st"> </span><span class="kw">c</span>(<span class="st">&quot;-A1-R.cr2&quot;</span>, <span class="st">&quot;-A2-R.cr2&quot;</span>, <span class="st">&quot;-A3-R.cr2&quot;</span>, <span class="st">&quot;-A4-R.cr2&quot;</span>, 
+    <span class="st">&quot;-B1-R.cr2&quot;</span>, <span class="st">&quot;-B2-R.cr2&quot;</span>, <span class="st">&quot;-B3-R.cr2&quot;</span>, <span class="st">&quot;-B4-R.cr2&quot;</span>, <span class="st">&quot;-C1-R.cr2&quot;</span>, <span class="st">&quot;-C2-R.cr2&quot;</span>, 
+    <span class="st">&quot;-C3-R.cr2&quot;</span>, <span class="st">&quot;-C4-R.cr2&quot;</span>, <span class="st">&quot;-D1-R.cr2&quot;</span>, <span class="st">&quot;-D2-R.cr2&quot;</span>, <span class="st">&quot;-D3-R.cr2&quot;</span>, <span class="st">&quot;-D4-R.cr2&quot;</span>, 
+    <span class="st">&quot;-A1-R2.cr2&quot;</span>, <span class="st">&quot;-A2-R2.cr2&quot;</span>, <span class="st">&quot;-A3-R2.cr2&quot;</span>, <span class="st">&quot;-A4-R2.cr2&quot;</span>, <span class="st">&quot;-B1-R2.cr2&quot;</span>, <span class="st">&quot;-B2-R2.cr2&quot;</span>, 
+    <span class="st">&quot;-B3-R2.cr2&quot;</span>, <span class="st">&quot;-B4-R2.cr2&quot;</span>, <span class="st">&quot;-C1-R2.cr2&quot;</span>, <span class="st">&quot;-C2-R2.cr2&quot;</span>, <span class="st">&quot;-C3-R2.cr2&quot;</span>, <span class="st">&quot;-C4-R2.cr2&quot;</span>, 
+    <span class="st">&quot;-D1-R2.cr2&quot;</span>, <span class="st">&quot;-D2-R2.cr2&quot;</span>, <span class="st">&quot;-D3-R2.cr2&quot;</span>, <span class="st">&quot;-D4-R2.cr2&quot;</span>)
+img_data_new &lt;-<span class="st"> </span>img_data %&gt;%<span class="st"> </span><span class="kw">group_by</span>(Patch, Location, Direction, Extension) %&gt;%<span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">N =</span> <span class="kw">row_number</span>()) %&gt;%<span class="st"> </span>rowwise %&gt;%<span class="st"> </span><span class="kw">mutate</span>(<span class="dt">Ends =</span> file_ends[[Extension]][N]) %&gt;%<span class="st"> </span>
+<span class="st">    </span><span class="kw">mutate</span>(<span class="dt">FullName =</span> <span class="kw">sprintf</span>(<span class="st">&quot;M%s%s%s%s&quot;</span>, Patch, Location, Direction, Ends))
+img_data_new$FullName</code></pre>
+<pre><code> [1] &quot;M11-2E2sb-A1-R.cr2&quot; &quot;M11-2E2sb-A2-R.cr2&quot; &quot;M11-2E2sb-A3-R.cr2&quot;
+ [4] &quot;M11-2E2sb-A4-R.cr2&quot; &quot;M11-2E2sb-B1-R.cr2&quot; &quot;M11-2E2sb-B2-R.cr2&quot;
+ [7] &quot;M11-2E2sb-B3-R.cr2&quot; &quot;M11-2E2sb-B4-R.cr2&quot; &quot;M11-2E2sb-A1-J.jpg&quot;
+[10] &quot;M11-2E2sb-A2-J.jpg&quot; &quot;M11-2E2sb-A3-J.jpg&quot; &quot;M11-2E2sb-A4-J.jpg&quot;
+[13] &quot;M11-2E2sb-B1-J.jpg&quot; &quot;M11-2E2sb-B2-J.jpg&quot; &quot;M11-2E2sb-B3-J.jpg&quot;
+[16] &quot;M11-2E2sb-B4-J.jpg&quot; &quot;M11-2R3nw-A1-R.cr2&quot; &quot;M11-2R3nw-A2-R.cr2&quot;
+[19] &quot;M11-2R3nw-A3-R.cr2&quot; &quot;M11-2R3nw-A4-R.cr2&quot; &quot;M11-2R3nw-B1-R.cr2&quot;
+[22] &quot;M11-2R3nw-A1-J.jpg&quot; &quot;M11-2R3nw-A2-J.jpg&quot; &quot;M11-2R3nw-A3-J.jpg&quot;
+[25] &quot;M11-2R3nw-A4-J.jpg&quot; &quot;M11-2R3nw-B1-J.jpg&quot; &quot;M11-2R3se-A1-R.cr2&quot;
+[28] &quot;M11-2R3se-A2-R.cr2&quot; &quot;M11-2R3se-A3-R.cr2&quot; &quot;M11-2R3se-A4-R.cr2&quot;
+[31] &quot;M11-2R3se-A1-J.jpg&quot; &quot;M11-2R3se-A2-J.jpg&quot; &quot;M11-2R3se-A3-J.jpg&quot;
+[34] &quot;M11-2R3se-A4-J.jpg&quot; &quot;M11-2R4nw-A1-R.cr2&quot; &quot;M11-2R4nw-A2-R.cr2&quot;
+[37] &quot;M11-2R4nw-A3-R.cr2&quot; &quot;M11-2R4nw-A4-R.cr2&quot; &quot;M11-2R4nw-B1-R.cr2&quot;
+[40] &quot;M11-2R4nw-A1-J.jpg&quot; &quot;M11-2R4nw-A2-J.jpg&quot; &quot;M11-2R4nw-A3-J.jpg&quot;
+[43] &quot;M11-2R4nw-A4-J.jpg&quot; &quot;M11-2R4nw-B1-J.jpg&quot; &quot;M11-2R4se-A1-R.cr2&quot;
+[46] &quot;M11-2R4se-A2-R.cr2&quot; &quot;M11-2R4se-A3-R.cr2&quot; &quot;M11-2R4se-A4-R.cr2&quot;
+[49] &quot;M11-2R4se-A1-J.jpg&quot; &quot;M11-2R4se-A2-J.jpg&quot; &quot;M11-2R4se-A3-J.jpg&quot;
+[52] &quot;M11-2R4se-A4-J.jpg&quot; &quot;M11-2S1nw-A1-R.cr2&quot; &quot;M11-2S1nw-A2-R.cr2&quot;
+[55] &quot;M11-2S1nw-A3-R.cr2&quot; &quot;M11-2S1nw-A4-R.cr2&quot; &quot;M11-2S1nw-B1-R.cr2&quot;
+[58] &quot;M11-2S1nw-B2-R.cr2&quot; &quot;M11-2S1nw-B3-R.cr2&quot; &quot;M11-2S1nw-B4-R.cr2&quot;
+[61] &quot;M11-2S1nw-A1-J.jpg&quot; &quot;M11-2S1nw-A2-J.jpg&quot; &quot;M11-2S1nw-A3-J.jpg&quot;
+[64] &quot;M11-2S1nw-A4-J.jpg&quot; &quot;M11-2S1nw-B1-J.jpg&quot; &quot;M11-2S1nw-B2-J.jpg&quot;
+[67] &quot;M11-2S1nw-B3-J.jpg&quot; &quot;M11-2S1nw-B4-J.jpg&quot; &quot;M11-2S1se-A1-R.cr2&quot;
+[70] &quot;M11-2S1se-A2-R.cr2&quot; &quot;M11-2S1se-A3-R.cr2&quot; &quot;M11-2S1se-A4-R.cr2&quot;
+[73] &quot;M11-2S1se-B1-R.cr2&quot; &quot;M11-2S1se-B2-R.cr2&quot; &quot;M11-2S1se-B3-R.cr2&quot;
+ [ reached getOption(&quot;max.print&quot;) -- omitted 3509 entries ]</code></pre>
+<p>Now at last we can copt and rename the files.</p>
+<pre class="sourceCode r"><code class="sourceCode r">old_files &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/&quot;</span>, 
+    img_data_new$file_name)
+new_files &lt;-<span class="st"> </span><span class="kw">paste0</span>(<span class="st">&quot;/media/Kimberley-DataPhotos/5) Patch Sorted MP Photos-Checked/Renamed/&quot;</span>, 
+    img_data_new$FullName)
+<span class="kw">file.copy</span>(old_files, new_files, <span class="dt">copy.date =</span> <span class="ot">TRUE</span>)</code></pre>
 
 
 </div>
